@@ -1,0 +1,19 @@
+{
+	"name": "zk-token-transfer",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"build": "cd backend && npm i && yarn hardhat compile && cp -r artifacts ../frontend/src",
+		"deploy": "npx hardhat run ./backend/scripts/deploy.js",
+		"node": "npx hardhat node",
+		"test": "cd backend && yarn hardhat test"
+	},
+	"dependencies": {
+		"@openzeppelin/contracts": "^4.7.3",
+		"dotenv": "^16.0.2"
+	},
+	"devDependencies": {
+		"@nomicfoundation/hardhat-toolbox": "^1.0.2",
+		"hardhat": "^2.10.1"
+	}
+}

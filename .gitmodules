@@ -1,0 +1,6 @@
+[submodule "backend/zkToken"]
+	path = backend/zkToken
+	url = git@github.com:druzhtech/zkToken-contracts.git
+[submodule "backend"]
+	path = backend
+	url = git@github.com:druzhtech/zkToken-contracts.git
