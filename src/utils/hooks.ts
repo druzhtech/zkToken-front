@@ -5,6 +5,7 @@ import { Provider } from './provider.ts';
 
 export function useEagerConnect(): boolean {
   const { activate, active } = useWeb3React<Provider>();
+  const {zkToken, setZktoken} = useState();
 
   const [tried, setTried] = useState(false);
 
