@@ -10,6 +10,8 @@ import  { getProvider } from './utils/provider.ts';
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 
+/*test*/
+
 root.render(
   <StrictMode>
     <Web3ReactProvider getLibrary={getProvider}>
