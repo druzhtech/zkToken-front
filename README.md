@@ -7,6 +7,9 @@ ZKToken is a special kind of ERC-20 token that has special privacy features.
 
 This repository contains the frontend for the service.
 
-```
-git submodule update --remote
+
+```sh
+mv backend/ backend-old && rm -r backend-old
+git submodule update --init
+
 ```

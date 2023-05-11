@@ -57,21 +57,21 @@ export function Transfer(): ReactElement {
     setSigner(library.getSigner());
   }, [library]);
 
-  useEffect((): void => {
-    if (!zktContract) {
-      return;
-    }
+  // useEffect((): void => {
+  //   if (!zktContract) {
+  //     return;
+  //   }
 
-    async function getW3phContract(zktContract: Contract): Promise<void> {
-      const _version = await zktContract.name();
+  //   async function getW3phContract(zktContract: Contract): Promise<void> {
+  //     const _version = await zktContract.name();
 
-      if (_version !== version) {
-        setVersion(_version);
-      }
-    }
+  //     if (_version !== version) {
+  //       setVersion(_version);
+  //     }
+  //   }
 
-    getW3phContract(zktContract);
-  }, [zktContract, version]);
+  //   getW3phContract(zktContract);
+  // }, [zktContract, version]);
 
   function handleMint(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
