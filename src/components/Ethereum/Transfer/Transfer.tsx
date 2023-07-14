@@ -8,19 +8,19 @@ import {
   useState
 } from 'react';
 import styled from 'styled-components';
-import zkToken from '../../artifacts/contracts/zkToken.sol/zkToken.json';
-import { Provider } from '../../utils/provider';
+import zkToken from '../../../artifacts/contracts/zkToken.sol/zkToken.json';
+import { Provider } from '../../../utils/provider';
 // import { SectionDivider } from './SectionDivider';
 import { strictEqual } from 'assert';
 import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-  Input, Text,
+  Input, InputProps,
   FormHelperText,
   useMultiStyleConfig,
   Card,
-  CardHeader,
+  CardHeader, Text,
   Heading,
   CardBody,
   CardFooter,
@@ -37,12 +37,14 @@ interface ProofJson {
   curve: String;
 }
 
-export function Registration(): ReactElement {
+
+export function Transfer(): ReactElement {
   const context = useWeb3React<Provider>();
-  const { library, active, } = context;
+  const { library, active } = context;
 
   const [signer, setSigner] = useState<Signer>();
   const [zktContract, setContract] = useState<Contract>();
+  const [address, setAddress] = useState<String>('');
   const [input, setInput] = useState<Array<String>>();
   const [proof, setProof] = useState<ProofJson>();
 
@@ -55,20 +57,26 @@ export function Registration(): ReactElement {
     setSigner(library.getSigner());
   }, [library]);
 
-  useEffect((): void => {
-    if (!zktContract) {
-      return;
-    }
+  // useEffect((): void => {
+  //   if (!zktContract) {
+  //     return;
+  //   }
 
-    // async function instContract(zktContract: Contract): Promise<void> {
-    // }
-    // instContract(zktContract);
-  }, [zktContract]);
+  //   async function getW3phContract(zktContract: Contract): Promise<void> {
+  //     const _version = await zktContract.name();
 
-  function handleRegistration(event: MouseEvent<HTMLButtonElement>): void {
+  //     if (_version !== version) {
+  //       setVersion(_version);
+  //     }
+  //   }
+
+  //   getW3phContract(zktContract);
+  // }, [zktContract, version]);
+
+  function handleMint(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
 
-    // only deploy the contract one time, when a signer is defined
+    // only deploy the W3PH contract one time, when a signer is defined
     if (zktContract || !signer) {
       return;
     }
@@ -76,11 +84,12 @@ export function Registration(): ReactElement {
     let address: string = "0x31eEB76500299284113C029C9B3dC5c0f442689c";
     const ZKT = new ethers.Contract(address, zkToken.abi, signer);
 
-    async function submitRegistration(zktContract: Contract): Promise<void> {
+    async function submitMint(zkt: Contract): Promise<void> {
       console.log("STEP 1")
-      try {
 
-        const registrationTx = await zktContract.registration(
+      try {
+        const registrationTx = await zkt.mint(
+          address,
           [proof.pi_a[0], proof.pi_a[1]],
           [
             [proof.pi_b[0][1], proof.pi_b[0][0]],
@@ -89,13 +98,17 @@ export function Registration(): ReactElement {
           [proof.pi_c[0], proof.pi_c[1]],
           input, { gasLimit: 100000 });
 
+        // TODO: spinner on
+
         // Транзакция
         let txReceipt = await registrationTx.wait();
         console.log("txReceipt: ", txReceipt);
 
+        // TODO: spinner off
+
         // События
-        const filter = zktContract.filters.Registration();
-        let events = await zktContract.queryFilter(filter).then(console.log);
+        const filter = zkt.filters.Registration();
+        let events = await zkt.queryFilter(filter).then(console.log);
         console.log("Registration Events: ", events)
 
       } catch (error: any) {
@@ -104,14 +117,20 @@ export function Registration(): ReactElement {
         );
       }
     }
-    submitRegistration(ZKT);
+    submitMint(ZKT);
+  }
+
+  function handleAddress(event: ChangeEvent<HTMLInputElement>): void {
+    event.preventDefault();
+    setAddress(event.target.value);
+    console.log("address: ", address)
   }
 
   function handleProof(e: any): void {
     let obj: ProofJson;
     const fileReader = new FileReader();
 
-    // TODO: check e.target.files exists --   if (e.target.files)
+    // TODO: check e.target.files exists -- if (e.target.files)
     fileReader.readAsText(e.target.files[0], "UTF-8");
     fileReader.onload = e => {
       obj = JSON.parse(e.target.result);
@@ -134,34 +153,35 @@ export function Registration(): ReactElement {
 
   }
 
+
   const styles = useMultiStyleConfig("Button", { variant: "outline" });
+
 
   return (
 
     <Card borderColor={"blackAlpha.700"} borderWidth={"1px"} borderRadius={"sm"}>
       <CardHeader>
-        <Heading size='md'>Registration</Heading>
-        <Text>This step required for</Text>
+        <Heading size='md'>Mint</Heading>
+        <Text size='sm'>Description</Text>
 
       </CardHeader>
       <CardBody>
         <FormControl>
-          <FormLabel>Proof</FormLabel>
-          <Input type="file"
-            sx={{
-              "::file-selector-button": {
-                border: "none",
-                outline: "none",
-                mr: 2,
-                ...styles,
-              }
+          <FormLabel>Address</FormLabel>
+          <Input type='text' sx={{
+            "::file-selector-button": {
+              border: "none",
+              outline: "none",
+              mr: 2,
+              ...styles,
+            },
+          }}
+            onChange={handleAddress}
 
-            }}
-            onChange={handleProof}
           />
           <br />
           <br />
-          <FormLabel>Input <small>value</small></FormLabel>
+          <FormLabel>Proof</FormLabel>
           <Input type='file' sx={{
             "::file-selector-button": {
               border: "none",
@@ -169,14 +189,28 @@ export function Registration(): ReactElement {
               mr: 2,
               ...styles,
             },
-          }} onChange={handleInput} />
-          <FormHelperText>We'll never share your email.</FormHelperText>
+          }}
+            onChange={handleProof}
 
+          />
+          <br />
+          <br />
+          <FormLabel>Input</FormLabel>
+          <Input type='file' sx={{
+            "::file-selector-button": {
+              border: "none",
+              outline: "none",
+              mr: 2,
+              ...styles,
+            },
+          }}
+            onChange={handleInput}
+          />
         </FormControl>
 
       </CardBody>
-      <Center>   <CardFooter>
-        <Button colorScheme='blue' onClick={handleRegistration}>Registration</Button>
+      <Center><CardFooter>
+        <Button colorScheme='blue' onClick={handleMint}>Transfer</Button>
       </CardFooter></Center>
     </Card>
 

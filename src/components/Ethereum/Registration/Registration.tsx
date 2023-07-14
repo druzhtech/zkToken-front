@@ -8,19 +8,19 @@ import {
   useState
 } from 'react';
 import styled from 'styled-components';
-import zkToken from '../../artifacts/contracts/zkToken.sol/zkToken.json';
-import { Provider } from '../../utils/provider';
+import zkToken from '../../../artifacts/contracts/zkToken.sol/zkToken.json';
+import { Provider } from '../../../utils/provider';
 // import { SectionDivider } from './SectionDivider';
 import { strictEqual } from 'assert';
 import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-  Input, InputProps,
+  Input, Text,
   FormHelperText,
   useMultiStyleConfig,
   Card,
-  CardHeader, Text,
+  CardHeader,
   Heading,
   CardBody,
   CardFooter,
@@ -28,6 +28,9 @@ import {
   Center,
 } from '@chakra-ui/react'
 import React from 'react';
+// const snarkjs = require("snarkjs");
+// import { groth16 } from 'snarkjs';
+
 
 interface ProofJson {
   pi_a: string[];
@@ -37,14 +40,12 @@ interface ProofJson {
   curve: String;
 }
 
-
-export function Transfer(): ReactElement {
+export function Registration(): ReactElement {
   const context = useWeb3React<Provider>();
-  const { library, active } = context;
+  const { library, active, } = context;
 
   const [signer, setSigner] = useState<Signer>();
   const [zktContract, setContract] = useState<Contract>();
-  const [address, setAddress] = useState<String>('');
   const [input, setInput] = useState<Array<String>>();
   const [proof, setProof] = useState<ProofJson>();
 
@@ -57,26 +58,20 @@ export function Transfer(): ReactElement {
     setSigner(library.getSigner());
   }, [library]);
 
-  // useEffect((): void => {
-  //   if (!zktContract) {
-  //     return;
-  //   }
+  useEffect((): void => {
+    if (!zktContract) {
+      return;
+    }
 
-  //   async function getW3phContract(zktContract: Contract): Promise<void> {
-  //     const _version = await zktContract.name();
+    // async function instContract(zktContract: Contract): Promise<void> {
+    // }
+    // instContract(zktContract);
+  }, [zktContract]);
 
-  //     if (_version !== version) {
-  //       setVersion(_version);
-  //     }
-  //   }
-
-  //   getW3phContract(zktContract);
-  // }, [zktContract, version]);
-
-  function handleMint(event: MouseEvent<HTMLButtonElement>): void {
+  function handleRegistration(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
 
-    // only deploy the W3PH contract one time, when a signer is defined
+    // only deploy the contract one time, when a signer is defined
     if (zktContract || !signer) {
       return;
     }
@@ -84,12 +79,11 @@ export function Transfer(): ReactElement {
     let address: string = "0x31eEB76500299284113C029C9B3dC5c0f442689c";
     const ZKT = new ethers.Contract(address, zkToken.abi, signer);
 
-    async function submitMint(zkt: Contract): Promise<void> {
+    async function submitRegistration(zktContract: Contract): Promise<void> {
       console.log("STEP 1")
-
       try {
-        const registrationTx = await zkt.mint(
-          address,
+
+        const registrationTx = await zktContract.registration(
           [proof.pi_a[0], proof.pi_a[1]],
           [
             [proof.pi_b[0][1], proof.pi_b[0][0]],
@@ -98,17 +92,13 @@ export function Transfer(): ReactElement {
           [proof.pi_c[0], proof.pi_c[1]],
           input, { gasLimit: 100000 });
 
-        // TODO: spinner on
-
         // Транзакция
         let txReceipt = await registrationTx.wait();
         console.log("txReceipt: ", txReceipt);
 
-        // TODO: spinner off
-
         // События
-        const filter = zkt.filters.Registration();
-        let events = await zkt.queryFilter(filter).then(console.log);
+        const filter = zktContract.filters.Registration();
+        let events = await zktContract.queryFilter(filter).then(console.log);
         console.log("Registration Events: ", events)
 
       } catch (error: any) {
@@ -117,31 +107,36 @@ export function Transfer(): ReactElement {
         );
       }
     }
-    submitMint(ZKT);
+    submitRegistration(ZKT);
   }
 
-  function handleAddress(event: ChangeEvent<HTMLInputElement>): void {
-    event.preventDefault();
-    setAddress(event.target.value);
-    console.log("address: ", address)
-  }
+  // async function calculateProof() {
 
-  function handleProof(e: any): void {
-    let obj: ProofJson;
-    const fileReader = new FileReader();
+  //   const vkey = await fetch("verification_key.json").then(function (res) {
+  //     return res.json();
+  //   });
 
-    // TODO: check e.target.files exists -- if (e.target.files)
-    fileReader.readAsText(e.target.files[0], "UTF-8");
-    fileReader.onload = e => {
-      obj = JSON.parse(e.target.result);
-      console.log("obj: ", obj);
-      setProof(obj);
-    };
-  }
+  //   const res = await snarkjs.groth16.verify(vkey, publicSignals, proof);
+  //   console.log("res: ", res)
+  // }
 
   function handleInput(e: any): void {
     const fileReader = new FileReader();
     let array: Array<String>;
+
+    let wasmFile = "http://localhost:3000/registration.wasm";
+    let registrationZkeyFile = "http://localhost:3000/registration_0001.zkey";
+
+    console.log("wasmFile: ", wasmFile)
+
+    const { proof, publicSignals } = snarkjs.groth16.fullProve({
+      "encryptedBalance": "14482943719185885411",
+      "balance": "0",
+      "pubKey": ["11602453138767397513", "3192754792", "3822292349"]
+    }, wasmFile, registrationZkeyFile)
+
+    console.log("proof: ", proof)
+    console.log("publicSignals: ", publicSignals)
 
     // TODO: check e.target.files exists --   if (e.target.files)
     fileReader.readAsText(e.target.files[0], "UTF-8");
@@ -150,9 +145,7 @@ export function Transfer(): ReactElement {
       console.log("arr: ", array)
       setInput(array);
     };
-
   }
-
 
   const styles = useMultiStyleConfig("Button", { variant: "outline" });
 
@@ -161,27 +154,13 @@ export function Transfer(): ReactElement {
 
     <Card borderColor={"blackAlpha.700"} borderWidth={"1px"} borderRadius={"sm"}>
       <CardHeader>
-        <Heading size='md'>Mint</Heading>
-        <Text size='sm'>Description</Text>
+        <Heading size='md'>Registration</Heading>
+        <Text>This step required for</Text>
 
       </CardHeader>
       <CardBody>
         <FormControl>
-          <FormLabel>Address</FormLabel>
-          <Input type='text' sx={{
-            "::file-selector-button": {
-              border: "none",
-              outline: "none",
-              mr: 2,
-              ...styles,
-            },
-          }}
-            onChange={handleAddress}
-
-          />
-          <br />
-          <br />
-          <FormLabel>Proof</FormLabel>
+          <FormLabel>keyPair<small>.json</small></FormLabel>
           <Input type='file' sx={{
             "::file-selector-button": {
               border: "none",
@@ -189,28 +168,31 @@ export function Transfer(): ReactElement {
               mr: 2,
               ...styles,
             },
-          }}
-            onChange={handleProof}
+          }} onChange={handleInput} />
+          <FormHelperText>We'll never share your email.</FormHelperText>
 
-          />
-          <br />
-          <br />
-          <FormLabel>Input</FormLabel>
-          <Input type='file' sx={{
-            "::file-selector-button": {
-              border: "none",
-              outline: "none",
-              mr: 2,
-              ...styles,
-            },
-          }}
-            onChange={handleInput}
-          />
         </FormControl>
 
       </CardBody>
-      <Center><CardFooter>
-        <Button colorScheme='blue' onClick={handleMint}>Transfer</Button>
+      <Center>   <CardFooter>
+        <Button colorScheme='blue' onClick={handleRegistration}>Registration</Button>
+        <button onClick={async () => {
+
+          let wasmFile = "http://localhost:3000/registration.wasm";
+          let registrationZkeyFile = "http://localhost:3000/registration_0001.zkey";
+
+          const { proof, publicSignals } = await snarkjs.groth16.fullProve({
+            "encryptedBalance": "14482943719185885411",
+            "balance": "0",
+            "pubKey": ["11602453138767397513", "3192754792", "3822292349"]
+          }, wasmFile, registrationZkeyFile)
+
+
+          console.log("proof: ", proof)
+          console.log("publicSignals: ", publicSignals)
+        }
+        }> Button
+        </button>
       </CardFooter></Center>
     </Card>
 

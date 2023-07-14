@@ -8,8 +8,8 @@ import {
   useState
 } from 'react';
 import styled from 'styled-components';
-import zkToken from '../../artifacts/contracts/zkToken.sol/zkToken.json';
-import { Provider } from '../../utils/provider';
+import zkToken from '../../../artifacts/contracts/zkToken.sol/zkToken.json';
+import { Provider } from '../../../utils/provider';
 // import { SectionDivider } from './SectionDivider';
 import { strictEqual } from 'assert';
 import {

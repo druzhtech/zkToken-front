@@ -5,7 +5,21 @@ import App from './components/App.tsx';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
 import { Web3ReactProvider } from '@web3-react/core';
-import  { getProvider } from './utils/provider.ts';
+import { getProvider } from './utils/provider.ts';
+
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+
+
+
+// const router = createBrowserRouter([
+//   {
+//     path: "/",
+//     element: <div>Hello world!</div>,
+//   },
+// ]);
 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
@@ -14,6 +28,8 @@ const root = ReactDOM.createRoot(container);
 
 root.render(
   <StrictMode>
+    {/* <RouterProvider router={router} /> */}
+
     <Web3ReactProvider getLibrary={getProvider}>
       <ColorModeScript />
       <App />

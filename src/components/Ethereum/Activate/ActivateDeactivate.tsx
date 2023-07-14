@@ -5,9 +5,9 @@ import {
   UserRejectedRequestError
 } from '@web3-react/injected-connector';
 import { MouseEvent, ReactElement, useState } from 'react';
-import { injected } from '../../utils/connectors.ts';
-import { useEagerConnect, useInactiveListener } from '../../utils/hooks.ts';
-import { Provider } from '../../utils/provider';
+import { injected } from '../../../utils/connectors.ts';
+import { useEagerConnect, useInactiveListener } from '../../../utils/hooks.ts';
+import { Provider } from '../../../utils/provider';
 import {
   Center,
   Button,
