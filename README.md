@@ -2,7 +2,8 @@
 
 ZKToken is a special kind of ERC-20 token that has special privacy features. 
 
-- Goerli `0x31eEB76500299284113C029C9B3dC5c0f442689c`
+- Siberium  `0xa753614F449d263487D506CD40c697E49e28d3d8`
+
 
 This repository contains the frontend for the service.
 
