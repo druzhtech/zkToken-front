@@ -222,17 +222,13 @@ function TokenBalance(): ReactElement {
   return (
     <>
       <span>
-        <strong>zkToken Balance</strong>
+        <strong>zkToken Balance </strong>
       </span>
       <span role="img" aria-label="gold">
         💰
       </span>
       <span>
-        {balance === null
-          ? 'Error'
-          : balance
-          ? `${balance.toString()}`
-          : 'Loading...'}
+        {balance === null ? 'Error' : balance ? `${balance.toString()}` : '0'}
       </span>
     </>
   );
