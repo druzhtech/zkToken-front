@@ -33,6 +33,7 @@ import MinaBody from "./Mina/MinaBody.tsx";
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import { useWeb3React } from '@web3-react/core';
 import { Provider } from '../utils/provider';
+import { ActivateDeactivate } from './Ethereum/Activate/ActivateDeactivate.tsx';
 
 const Links = [{ name: 'Ethereum', address: 'eth' }, { name: 'Mina', address: 'mina' }];
 
@@ -88,6 +89,8 @@ function App() {
             </HStack>
           </HStack>
           <Flex alignItems={'center'}>
+            <ActivateDeactivate />
+            {/* 
             <Button
               variant={'solid'}
               colorScheme={'teal'}
@@ -95,8 +98,7 @@ function App() {
               mr={4}
             // leftIcon={<AddIcon />}
             >
-              Connection
-            </Button>
+            </Button> */}
             {/* <Menu>
               <MenuButton
                 as={Button}
