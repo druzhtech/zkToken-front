@@ -30,6 +30,7 @@ import {
 import React from 'react';
 // const snarkjs = require("snarkjs");
 // import { groth16 } from 'snarkjs';
+import { generateRandomKeys, PublicKey, KeyPair } from 'paillier-bigint';
 
 
 interface ProofJson {
@@ -124,20 +125,6 @@ export function Registration(): ReactElement {
     const fileReader = new FileReader();
     let array: Array<String>;
 
-    let wasmFile = "http://localhost:3000/registration.wasm";
-    let registrationZkeyFile = "http://localhost:3000/registration_0001.zkey";
-
-    console.log("wasmFile: ", wasmFile)
-
-    const { proof, publicSignals } = snarkjs.groth16.fullProve({
-      "encryptedBalance": "14482943719185885411",
-      "balance": "0",
-      "pubKey": ["11602453138767397513", "3192754792", "3822292349"]
-    }, wasmFile, registrationZkeyFile)
-
-    console.log("proof: ", proof)
-    console.log("publicSignals: ", publicSignals)
-
     // TODO: check e.target.files exists --   if (e.target.files)
     fileReader.readAsText(e.target.files[0], "UTF-8");
     fileReader.onload = e => {
@@ -169,32 +156,100 @@ export function Registration(): ReactElement {
               ...styles,
             },
           }} onChange={handleInput} />
-          <FormHelperText>We'll never share your email.</FormHelperText>
+          {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
 
         </FormControl>
 
       </CardBody>
-      <Center>   <CardFooter>
-        <Button colorScheme='blue' onClick={handleRegistration}>Registration</Button>
-        <button onClick={async () => {
+      <Center>
+        <CardFooter>
+          <Button colorScheme='blue' onClick={async () => {
 
-          let wasmFile = "http://localhost:3000/registration.wasm";
-          let registrationZkeyFile = "http://localhost:3000/registration_0001.zkey";
+            let wasmFile = "http://localhost:3000/registration.wasm";
+            let registrationZkeyFile = "http://localhost:3000/registration_0001.zkey";
 
-          const { proof, publicSignals } = await snarkjs.groth16.fullProve({
-            "encryptedBalance": "14482943719185885411",
-            "balance": "0",
-            "pubKey": ["11602453138767397513", "3192754792", "3822292349"]
-          }, wasmFile, registrationZkeyFile)
+            // const num: any = input.n.toNumber();
+            const r = BigInt(Math.floor(Math.random() * Number(input.n.toString())));
 
+            const pub = new PublicKey(BigInt(Number(input.n)), BigInt(Number(input.g)));
 
-          console.log("proof: ", proof)
-          console.log("publicSignals: ", publicSignals)
-        }
-        }> Button
-        </button>
-      </CardFooter></Center>
-    </Card>
+            const zero = 0;
+
+            const balanceAZero = pub.encrypt(zero, r).toString();
+
+            console.log("balanceAZero: ", balanceAZero)
+
+            const inputAJSON = {
+              encryptedBalance: balanceAZero,
+              balance: '0',
+              pubKey: [input.g.toString(), r.toString(), input.n.toString()],
+            }
+
+            const { proof, publicSignals } = await snarkjs.groth16.fullProve(inputAJSON, wasmFile, registrationZkeyFile)
+
+            try {
+              // const keys: KeyPair = await generateRandomKeys(32);
+              const proofFile = document.createElement("a");
+              const pi_a = [
+                proof.pi_a[0].toString(),
+                proof.pi_a[1].toString(),
+                proof.pi_a[2].toString()
+              ];
+              const pi_b = {
+                0: [proof.pi_b[0][0].toString(), proof.pi_b[0][1].toString()],
+                1: [proof.pi_b[1][0].toString(), proof.pi_b[1][1].toString()],
+                2: [proof.pi_b[2][0].toString(), proof.pi_b[2][1].toString()],
+              };
+              const pi_c = [proof.pi_c[0].toString(), proof.pi_c[1].toString(), proof.pi_c[2].toString()]
+
+              const proofJson = {
+                curve: proof.curve.toString(),
+                pi_a: pi_a,
+                pi_b: pi_b,
+                pi_c: pi_c,
+                protocol: proof.protocol.toString(),
+              }
+              const proofJsonFile = new Blob([JSON.stringify(proofJson)] as any, { type: 'text/plain' }); //pass data from localStorage API to blob
+              proofFile.href = URL.createObjectURL(proofJsonFile);
+              proofFile.download = "proof.json";
+              document.body.appendChild(proofFile);
+              proofFile.click();
+
+            } catch (error: any) {
+              console.log(
+                'Error!' + (error && error.message ? `\n\n${error.message}` : '')
+              );
+            }
+
+            try {
+              const signalFile = document.createElement("a");
+
+              const signalsJson = [
+                publicSignals[0].toString(),
+                publicSignals[1].toString(),
+                publicSignals[2].toString(),
+                publicSignals[3].toString(),
+              ]
+
+              const signalJsonFile = new Blob([JSON.stringify(signalsJson)] as any, { type: 'text/plain' }); //pass data from localStorage API to blob
+              signalFile.href = URL.createObjectURL(signalJsonFile);
+              signalFile.download = "signals.json";
+              document.body.appendChild(signalFile);
+              signalFile.click();
+
+            } catch (error: any) {
+              console.log(
+                'Error!' + (error && error.message ? `\n\n${error.message}` : '')
+              );
+            }
+
+            console.log("proof: ", proof)
+            console.log("publicSignals: ", publicSignals)
+          }
+          }>Registration</Button>
+        </CardFooter>
+      </Center>
+    </Card >
 
   );
 }

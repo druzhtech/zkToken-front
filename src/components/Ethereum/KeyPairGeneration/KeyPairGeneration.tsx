@@ -17,7 +17,7 @@ import {
   Center,
 } from '@chakra-ui/react'
 import React from 'react';
-import { generateRandomKeys, KeyPair } from 'paillier-bigint';
+import { generateRandomKeys, encrypt, KeyPair } from 'paillier-bigint';
 
 export function KeyPairGeneration(): ReactElement {
   const context = useWeb3React<Provider>();
@@ -29,6 +29,7 @@ export function KeyPairGeneration(): ReactElement {
     async function keygen(): Promise<void> {
       try {
         const keys: KeyPair = await generateRandomKeys(32);
+        console.log("keys: ", keys);
         const element = document.createElement("a");
         const keyJson = {
           n: keys.publicKey.n.toString(),

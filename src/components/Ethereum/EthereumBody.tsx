@@ -34,9 +34,9 @@ function EthereumBody() {
             <Text color={'gray.500'}>
                 Completely anonymous Ethereum token created using ZKProofs.
             </Text>
-            
-            <ActivateDeactivate />
-            <WalletStatus />
+
+            {/* <ActivateDeactivate /> */}
+            {/* <WalletStatus /> */}
             <KeyPairGeneration />
             <Registration />
             <Mint />
