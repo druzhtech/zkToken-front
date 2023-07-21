@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import { ReactElement, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Provider } from '../../utils/provider.ts';
+import zkToken from '../../../artifacts/contracts/zkToken.sol/zkToken.json';
 import {
   ChakraProvider,
   Box,
@@ -82,9 +83,9 @@ function BlockNumber(): ReactElement {
 
   return (
     <span>
-      <strong>Block:</strong> {blockNumber === null ? 'Error' : blockNumber ?? ''}
+      <strong>Block:</strong>{' '}
+      {blockNumber === null ? 'Error' : blockNumber ?? ''}
     </span>
-
   );
 }
 
@@ -94,13 +95,14 @@ function Account(): ReactElement {
   return (
     <>
       <span>
-        <strong>Account:</strong> {typeof account === 'undefined'
+        <strong>Account:</strong>{' '}
+        {typeof account === 'undefined'
           ? ''
           : account
-            ? `${account.substring(0, 6)}...${account.substring(
+          ? `${account.substring(0, 6)}...${account.substring(
               account.length - 4
             )}`
-            : ''}
+          : ''}
       </span>
     </>
   );
@@ -169,8 +171,68 @@ function Balance(): ReactElement {
         {balance === null
           ? 'Error'
           : balance
-            ? `Ξ${Math.round(+ethers.formatEther(balance) * 1e4) / 1e4}`
-            : ''}
+          ? `${Math.round(+ethers.formatEther(balance.toString()) * 1e4) / 1e4}`
+          : ''}
+      </span>
+    </>
+  );
+}
+
+function TokenBalance(): ReactElement {
+  const { account, library, chainId } = useWeb3React<Provider>();
+  const [balance, setBalance] = useState<ethers.BigNumber>();
+
+  useEffect((): (() => void) | undefined => {
+    if (typeof account === 'undefined' || account === null || !library) {
+      return undefined;
+    }
+
+    let stale = false;
+
+    const getBalance = async (
+      library: Provider,
+      account: string
+    ): Promise<void> => {
+      const signer = library.getSigner();
+      let address: string = '0xa753614F449d263487D506CD40c697E49e28d3d8';
+      const ZKT = new ethers.Contract(address, zkToken.abi, signer);
+
+      const balance: ethers.BigNumber = await ZKT.balanceOf(account);
+
+      if (!stale) {
+        setBalance(balance);
+      }
+    };
+
+    getBalance(library, account);
+
+    const getBalanceHandler = (): void => {
+      getBalance(library, account);
+    };
+
+    library.on('block', getBalanceHandler);
+
+    return (): void => {
+      stale = true;
+      library.removeListener('block', getBalanceHandler);
+      setBalance(undefined);
+    };
+  }, [account, library, chainId]);
+
+  return (
+    <>
+      <span>
+        <strong>zkToken Balance</strong>
+      </span>
+      <span role="img" aria-label="gold">
+        💰
+      </span>
+      <span>
+        {balance === null
+          ? 'Error'
+          : balance
+          ? `${balance.toString()}`
+          : 'Loading...'}
       </span>
     </>
   );
@@ -230,7 +292,8 @@ function NextNonce(): ReactElement {
   return (
     <>
       <span>
-        <strong>Next Nonce:</strong> {nextNonce === null ? 'Error' : nextNonce ?? ''}
+        <strong>Next Nonce:</strong>{' '}
+        {nextNonce === null ? 'Error' : nextNonce ?? ''}
       </span>
     </>
   );
@@ -239,15 +302,13 @@ function NextNonce(): ReactElement {
 function StatusIcon(): ReactElement {
   const { active, error } = useWeb3React<Provider>();
 
-  return (
-    <Text>{active ? '🟢' : error ? '🔴' : '🟠'}</Text>
-  );
+  return <Text>{active ? '🟢' : error ? '🔴' : '🟠'}</Text>;
 }
 
 export function WalletStatus(): ReactElement {
   return (
     <Center>
-      <HStack spacing='24px'>
+      <HStack spacing="24px">
         <Box>
           <ChainId />
         </Box>
@@ -263,10 +324,10 @@ export function WalletStatus(): ReactElement {
         <Box>
           <NextNonce />
         </Box>
-        <Box >
-          {/* <Balance /> */}
-        </Box>
-        <Box >
+        <Box>{<Balance />}</Box>
+        <Box></Box>
+        <Box>{<TokenBalance />}</Box>
+        <Box>
           <StatusIcon />
         </Box>
       </HStack>
