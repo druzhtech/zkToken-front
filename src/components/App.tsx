@@ -4,38 +4,30 @@ import {
   Box,
   Text,
   Link,
-  VStack,
-  Code,
-  Grid,
   theme,
   Heading,
   Container,
-  Button,
   Stack,
-  Icon,
   Flex,
-  Avatar,
   HStack,
   IconButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuDivider,
   useDisclosure,
   useColorModeValue,
-  createIcon
+  createIcon,
 } from '@chakra-ui/react';
 // import { Outlet, Link as RouterLink } from "react-router-dom";
-import EthereumBody from "./Ethereum/EthereumBody.tsx";
-import MinaBody from "./Mina/MinaBody.tsx";
+import EthereumBody from './Ethereum/EthereumBody.tsx';
+import MinaBody from './Mina/MinaBody.tsx';
 
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import { useWeb3React } from '@web3-react/core';
 import { Provider } from '../utils/provider';
 import { ActivateDeactivate } from './Ethereum/Activate/ActivateDeactivate.tsx';
 
-const Links = [{ name: 'Ethereum', address: 'eth' }, { name: 'Mina', address: 'mina' }];
+const Links = [
+  { name: 'Ethereum', address: 'eth' },
+  { name: 'Mina', address: 'mina' },
+];
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
@@ -46,14 +38,14 @@ const NavLink = ({ children }: { children: ReactNode }) => (
       textDecoration: 'none',
       bg: useColorModeValue('gray.200', 'gray.700'),
     }}
-    href={children.address}>
+    href={children.address}
+  >
     {/* <RouterLink to={children.address}>{children.name}</RouterLink> */}
     {children.name}
   </Link>
 );
 
 function App() {
-
   const context = useWeb3React<Provider>();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -75,58 +67,32 @@ function App() {
               <Heading
                 fontWeight={10}
                 fontSize={{ base: '2xl', sm: '2xl', md: '2xl' }}
-                lineHeight={'110%'}>
-                <Text as={'span'} color={'green.400'}>ZKToken</Text>
+                lineHeight={'110%'}
+              >
+                <Text as={'span'} color={'green.400'}>
+                  ZKToken
+                </Text>
               </Heading>
             </Box>
             <HStack
               as={'nav'}
               spacing={4}
-              display={{ base: 'none', md: 'flex' }}>
-              {Links.map((link) => (
+              display={{ base: 'none', md: 'flex' }}
+            >
+              {Links.map(link => (
                 <NavLink key={link}>{link}</NavLink>
               ))}
             </HStack>
           </HStack>
           <Flex alignItems={'center'}>
             <ActivateDeactivate />
-            {/* 
-            <Button
-              variant={'solid'}
-              colorScheme={'teal'}
-              size={'sm'}
-              mr={4}
-            // leftIcon={<AddIcon />}
-            >
-            </Button> */}
-            {/* <Menu>
-              <MenuButton
-                as={Button}
-                rounded={'full'}
-                variant={'link'}
-                cursor={'pointer'}
-                minW={0}>
-                <Avatar
-                  size={'sm'}
-                  src={
-                    'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                  }
-                />
-              </MenuButton>
-              <MenuList>
-                <MenuItem>Link 1</MenuItem>
-                <MenuItem>Link 2</MenuItem>
-                <MenuDivider />
-                <MenuItem>Link 3</MenuItem>
-              </MenuList>
-            </Menu> */}
           </Flex>
         </Flex>
 
         {isOpen ? (
           <Box pb={4} display={{ md: 'none' }}>
             <Stack as={'nav'} spacing={4}>
-              {Links.map((link) => (
+              {Links.map(link => (
                 <NavLink key={link.name}>{link.address}</NavLink>
               ))}
             </Stack>
@@ -139,7 +105,6 @@ function App() {
           <EthereumBody />
         </Container>
       </Box>
-
     </ChakraProvider>
   );
 }

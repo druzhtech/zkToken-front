@@ -227,9 +227,7 @@ function TokenBalance(): ReactElement {
       <span role="img" aria-label="gold">
         💰
       </span>
-      <span>
-        {balance === null ? 'Error' : balance ? `${balance.toString()}` : '0'}
-      </span>
+      <span>{balance === null ? 'Error' : balance ? `${balance}` : '0'}</span>
     </>
   );
 }

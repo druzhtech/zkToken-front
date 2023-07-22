@@ -31,7 +31,7 @@ import {
 import React from 'react';
 // const snarkjs = require("snarkjs");
 // import { groth16 } from 'snarkjs';
-import { generateRandomKeys, PublicKey, KeyPair } from 'paillier-bigint';
+import { PublicKey, PrivateKey } from 'paillier-bigint';
 
 interface ProofJson {
   pi_a: string[];
@@ -78,7 +78,6 @@ export function Registration(): ReactElement {
       return;
     }
 
-    //let address: string = "0x31eEB76500299284113C029C9B3dC5c0f442689c";
     let address: string = '0xa753614F449d263487D506CD40c697E49e28d3d8';
     const ZKT = new ethers.Contract(address, zkToken.abi, signer);
 
@@ -116,16 +115,6 @@ export function Registration(): ReactElement {
     submitRegistration(ZKT);
   }
 
-  // async function calculateProof() {
-
-  //   const vkey = await fetch("verification_key.json").then(function (res) {
-  //     return res.json();
-  //   });
-
-  //   const res = await snarkjs.groth16.verify(vkey, publicSignals, proof);
-  //   console.log("res: ", res)
-  // }
-
   function handleInput(e: any): void {
     const fileReader = new FileReader();
     let array: Array<String>;
@@ -149,7 +138,10 @@ export function Registration(): ReactElement {
     >
       <CardHeader>
         <Heading size="md">Registration</Heading>
-        <Text>This step required for</Text>
+        <Text>
+          This step is necessary to initialize balances for users who would want
+          to use the system with homomorphic encryption.
+        </Text>
       </CardHeader>
       <CardBody>
         <FormControl>
@@ -190,14 +182,23 @@ export function Registration(): ReactElement {
                 BigInt(Number(input.g))
               );
 
-              const zero = 0;
+              const priv = new PrivateKey(
+                BigInt(input.lambda),
+                BigInt(input.mu),
+                pub
+              );
 
-              const balanceAZero = pub.encrypt(zero, r).toString();
+              console.log(pub);
+              console.log(priv);
 
-              console.log('balanceAZero: ', balanceAZero);
+              const balanceZero = pub.encrypt(0n, r);
+
+              console.log('balanceZero: ', balanceZero);
+
+              console.log('Zero', priv.decrypt(BigInt(balanceZero)));
 
               const inputAJSON = {
-                encryptedBalance: balanceAZero,
+                encryptedBalance: balanceZero.toString(),
                 balance: '0',
                 pubKey: [input.g.toString(), r.toString(), input.n.toString()],
               };
@@ -209,7 +210,6 @@ export function Registration(): ReactElement {
               );
 
               try {
-                // const keys: KeyPair = await generateRandomKeys(32);
                 const proofFile = document.createElement('a');
                 const pi_a = [
                   proof.pi_a[0].toString(),
