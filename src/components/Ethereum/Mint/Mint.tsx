@@ -81,20 +81,23 @@ export function Mint(): ReactElement {
           publicSignals,
           { gasLimit: 1000000 }
         );
-
-        // Транзакция
-        let txReceipt = await mintTx.wait();
-        console.log('txReceipt: ', txReceipt);
-
-        const balance = await ZKT.balanceOf(signer);
-        console.log();
+        console.log(mintTx);
       } catch (error: any) {
         console.log(
           'Error!' + (error && error.message ? `\n\n${error.message}` : '')
         );
       }
     }
+    async function checkMint(zktContract: Contract): Promise<void> {
+      const pub = new PublicKey(BigInt(input.n), BigInt(input.g));
+
+      const priv = new PrivateKey(BigInt(input.lambda), BigInt(input.mu), pub);
+
+      const balance = await zktContract.balanceOf(signer);
+      console.log(priv.decrypt(balance));
+    }
     submitMint(ZKT);
+    checkMint(ZKT);
   }
 
   function handleInput(e: any): void {
@@ -175,7 +178,7 @@ export function Mint(): ReactElement {
               );
 
               const balanceMint = pub.encrypt(BigInt(tokenQuantity), r);
-              console.log(priv.decrypt(BigInt(balanceMint)));
+              console.log(priv.decrypt(balanceMint));
 
               console.log('balanceMint: ', balanceMint);
 

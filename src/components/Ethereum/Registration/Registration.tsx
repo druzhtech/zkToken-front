@@ -98,10 +98,6 @@ export function Registration(): ReactElement {
           { gasLimit: 1000000 }
         );
 
-        // Транзакция
-        let txReceipt = await registrationTx.wait();
-        console.log('txReceipt: ', txReceipt);
-
         // События
         const filter = zktContract.filters.Registration();
         let events = await zktContract.queryFilter(filter).then(console.log);
@@ -160,7 +156,6 @@ export function Registration(): ReactElement {
             }}
             onChange={handleInput}
           />
-          {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
         </FormControl>
       </CardBody>
       <Center>

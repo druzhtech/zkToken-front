@@ -1,33 +1,18 @@
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { ReactElement, useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { Provider } from '../../utils/provider.ts';
 import zkToken from '../../../artifacts/contracts/zkToken.sol/zkToken.json';
 import {
   ChakraProvider,
   Box,
   Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  theme,
-  Heading,
-  Container,
-  Button,
-  Stack,
-  Icon,
-  useColorModeValue,
-  createIcon,
   HStack,
   Center,
+  FormLabel,
+  Input,
 } from '@chakra-ui/react';
 type CleanupFunction = (() => void) | undefined;
-
-const StyledStatusIcon = styled.h1`
-  margin: 0px;
-`;
 
 function ChainId(): ReactElement {
   const { chainId } = useWeb3React<Provider>();
@@ -307,9 +292,7 @@ export function WalletStatus(): ReactElement {
           <ChainId />
         </Box>
 
-        <Box>
-          <BlockNumber />
-        </Box>
+        <Box>{<BlockNumber />}</Box>
 
         <Box>
           <Account />
@@ -319,7 +302,7 @@ export function WalletStatus(): ReactElement {
           <NextNonce />
         </Box>
         <Box>{<Balance />}</Box>
-        <Box></Box>
+        <Box> </Box>
         <Box>{<TokenBalance />}</Box>
         <Box>
           <StatusIcon />

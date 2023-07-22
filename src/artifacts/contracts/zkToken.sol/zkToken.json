@@ -112,6 +112,42 @@
           "internalType": "address",
           "name": "_to",
           "type": "address"
+        }
+      ],
+      "name": "getPubKey",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "g",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "n",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "powN2",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct zkToken.Key",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
         },
         {
           "internalType": "uint256[2]",
